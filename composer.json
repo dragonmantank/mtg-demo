@@ -1,12 +1,12 @@
 {
     "require": {
         "opentok/opentok": "dev-dev@dev",
-        "slim/slim": "^4.5",
+        "slim/slim": "^4.0",
         "vlucas/phpdotenv": "^4.0",
         "laminas/laminas-diactoros": "^2.3",
         "nexmo/jwt": "^0.1.0",
         "nexmo/client": "^2.0",
-        "php-di/php-di": "^6.2"
+        "php-di/php-di": "^6.0"
     },
     "autoload": {
         "psr-4": {
