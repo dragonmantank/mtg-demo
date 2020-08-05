@@ -1,0 +1,17 @@
+version: '3.4'
+
+services: 
+    redis:
+        image: redis
+
+    webserver:
+        build: 
+            context: ./
+            dockerfile: ./docker/Dockerfile
+            target: webserver
+
+    node:
+        build:
+            context: ./
+            dockerfile: ./docker/Dockerfile
+            target: node

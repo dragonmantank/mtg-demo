@@ -1,0 +1,18 @@
+#!/bin/bash
+
+OPERATION=$1
+shift
+ARGS=$*
+
+case ${OPERATION} in
+    "dev") docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d;;
+    "dev-stop") docker-compose -f docker-compose.yml -f docker-compose.dev.yml stop;;
+    "php") docker-compose -f docker-compose.yml -f docker-compose.dev.yml run --rm -u $UID php php ${ARGS};;
+    "artisan") docker-compose -f docker-compose.yml -f docker-compose.dev.yml run --rm -u $UID php php artisan ${ARGS};;
+    "composer") docker-compose -f docker-compose.yml -f docker-compose.dev.yml run --rm -u $UID composer ${ARGS};;
+    "node") docker-compose -f docker-compose.yml -f docker-compose.dev.yml run --rm -u $UID node node ${ARGS};;
+    "npm") docker-compose -f docker-compose.yml -f docker-compose.dev.yml run --rm -u $UID node npm ${ARGS};;
+    "mysql") docker-compose -f docker-compose.yml -f docker-compose.dev.yml run --rm -u $UID mysql mysql ${ARGS};;
+    "docker-compose") docker-compose -f docker-compose.yml -f docker-compose.dev.yml ${ARGS};;
+    *) echo "Unknown operation: ${OPERATION}";;
+esac
