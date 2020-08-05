@@ -13,6 +13,7 @@
     "@xstate/react": "^0.8.1",
     "axios": "^0.19.2",
     "emotion-theming": "^10.0.27",
+    "nexmo-client": "^6.0.10",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
