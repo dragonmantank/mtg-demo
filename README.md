@@ -17,7 +17,7 @@ The public folder is located at `frontend\public`.
 
 1. Copy `.env.dist` to `.env`
 2. Edit file with your OpenTok and Nexmo info
-3. Run `composer install` in the root of the project to download PHP dependencies
+3. Run `composer.phar install` in the root of the project to download PHP dependencies
 4. In `frontend/`, run `npm install` to download Node dependencies
 
 ### Docker
