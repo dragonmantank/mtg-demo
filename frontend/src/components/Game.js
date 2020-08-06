@@ -38,7 +38,12 @@ function Game({ machine }) {
 
         <Flex direction="row" justifyContent="space-around">
           <Flex direction="column" w={['640px']}>
-            <Box id="publisher" h={['360px']} w="100%" bg="red.300"></Box>
+            <div id="video-container">
+              <video width="640" height="360" crossOrigin="anonymous" muted></video>
+              <div id="help-section"></div>
+            </div>
+
+            <Box id="publisher" h={['0']} w="0" bg="red.300"></Box>
             <Flex
               h="100px"
               direction="row"
