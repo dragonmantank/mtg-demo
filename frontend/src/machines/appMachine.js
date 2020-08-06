@@ -1,29 +1,18 @@
 //top level app to manage states
 
-// on init, spawn player machine
 // start in a lobby with a chat channel
 // spawn player machines for others in channel
 // on game join, create a game machine, start players video
 import { Machine, assign, spawn } from 'xstate';
 import { gameMachine } from './gameMachine';
 import { playerMachine } from './playerMachine';
-const games = ['5678'];
+import axios from 'axios';
 
-const createNewGame = () =>
-  new Promise((res, rej) => {
-    games.push('1234');
-    return res('1234');
-  });
-
-// replace this with game look up on server
-const checkGameId = (gameId) =>
-  new Promise((res, rej) => {
-    console.log(gameId, games.indexOf(gameId));
-    if (games.indexOf(gameId) === -1) {
-      return rej('Game ID Not Found');
-    }
-    return res();
-  });
+const normalizeResponse = (data) => ({
+  conversationSession: data.conversation_session,
+  gameId: data.room_id,
+  videoSession: data.video_session,
+});
 
 export const appMachine = Machine(
          {
@@ -38,8 +27,8 @@ export const appMachine = Machine(
                id: 'init',
                entry: ['spawnPlayer'],
                on: {
-                 READY: '#lobby'
-               }
+                 READY: '#lobby',
+               },
              },
              lobby: {
                id: 'lobby',
@@ -48,9 +37,14 @@ export const appMachine = Machine(
                  idle: {},
                  joining: {
                    invoke: {
-                     src: 'joinGame', //look up game and join if exists
+                     src: 'findGame', //look up game and join if exists
                      onDone: {
                        target: '#game',
+                       actions: assign({
+                         gameData: (_, e) => {
+                           return normalizeResponse(e.data.data);
+                         },
+                       }),
                      },
                      onError: {
                        target: '#lobby.error',
@@ -68,8 +62,8 @@ export const appMachine = Machine(
                      onDone: {
                        target: '#game',
                        actions: assign({
-                         gameId: (ctx, e) => {
-                           return e.data;
+                         gameData: (_, e) => {
+                           return normalizeResponse(e.data.data);
                          },
                        }),
                      },
@@ -117,27 +111,24 @@ export const appMachine = Machine(
              }),
              spawnGame: assign({
                gameRef: (ctx, e) => {
-                 return spawn(gameMachine.withContext({ gameId: ctx.gameId }));
+                 return spawn(
+                   gameMachine.withContext({
+                     gameData: ctx.gameData,
+                     selfRef: ctx.selfRef,
+                   })
+                 );
                },
              }),
              updateGameId: assign({ gameId: (_, e) => e.gameId }),
              clearGameInfo: assign({
                gameId: '',
-               gameRef: '',
+               gameData: null,
+               gameRef: null,
              }),
-             createPlayer: () => {
-               console.log('new player created');
-             },
            },
            services: {
-             createGame: () => {
-               // creates new game on server
-               return createNewGame();
-             },
-             joinGame: (ctx, e) => {
-               // validates game exists and
-               return checkGameId(ctx.gameId);
-             },
+             createGame: () => axios.post('/game'),
+             findGame: (ctx, e) => axios.get(`/game/${ctx.gameDetails}/token`),
            },
          }
        );

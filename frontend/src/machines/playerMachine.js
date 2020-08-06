@@ -1,31 +1,68 @@
 // this machine track the details for a player
 import { Machine, assign, sendParent } from 'xstate';
-
+console.log(process.env.REACT_APP_OT_KEY);
 export const playerMachine = Machine(
   {
     id: 'player',
-    initial: 'idle',
+    initial: 'log_in',
     context: {
       name: '',
       user: null,
     },
     states: {
-      idle: {},
-      logging_in: {},
-      connected: {},
-    },
-    on: {
-      UPDATE_NAME: {
-        actions: 'updateName',
+      log_in: {
+        id: 'log_in',
+        on: {
+          UPDATE_NAME: {
+            actions: 'updateName',
+          },
+          JOIN_LOBBY: { 
+            // create conversation user before sending ready
+            actions: sendParent('READY'),
+          },
+        },
       },
-      JOIN_LOBBY: {
-        actions: sendParent('READY')
-      }
+      connected: {},
+      playing: {
+        id: 'playing',
+        initial: 'init',
+        states: {
+          init: {
+            invoke: [
+              {
+                src: 'getVideoToken',
+              },
+              {
+                src: 'joinConversation',
+              },
+            ],
+          },
+          ready: {
+            // create publisher
+            // publish video
+            // listen for events - video, conversations
+          },
+        },
+        on: {
+          START_VIDEO: {
+            actions: () => console.log('starting video'),
+            target: 'playing',
+          },
+        },
+      },
     },
   },
   {
     actions: {
       updateName: assign({ name: (_, e) => e.name }),
+    },
+    services: {
+      getVideoToken: () => {
+        console.log('Getting Token');
+      },
+      joinConversation: () => {
+        console.log('Joining Conversation');
+      },
     },
   }
 );

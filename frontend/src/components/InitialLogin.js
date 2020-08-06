@@ -4,7 +4,7 @@ import { Alert, AlertIcon, Button, Flex, Input } from '@chakra-ui/core';
 
 function InitialLogin({ machine }) {
   const [state, send] = useService(machine);
-  console.log(state);
+  console.log('InitialLogin', state);
   return (
     <Flex
       direction="column"

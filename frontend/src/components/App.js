@@ -12,7 +12,7 @@ function App() {
   useEffect(() => {
     const subscription = service.subscribe((state) => {
       // simple state logging
-      console.log(state);
+      console.log('APP STATE', state);
     });
 
     return subscription.unsubscribe;
@@ -31,7 +31,7 @@ function App() {
         />
       ) : null}
       {state.value === 'game' ? (
-        <Game machine={state.context.gameRef} />
+        <Game />
       ) : null}
     </Flex>
   );
