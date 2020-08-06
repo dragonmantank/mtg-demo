@@ -91,6 +91,20 @@ class Conversations
         return null;       
     }
 
+    public function getUser(string $uuid) : ?array
+    {
+        $factory = new RequestFactory();
+        $request = $factory->createRequest(
+            'GET',
+            'https://api.nexmo.com/beta2/users/' . $uuid,
+        );
+
+        $apiResponse = $this->nexmoClient->send($request);
+        $data = json_decode($apiResponse->getBody()->getContents(), true);
+
+        return $data;
+    }
+
     public function findMemberByUserId(string $conversationId, string $userId) : ?array
     {
         $factory = new RequestFactory();

@@ -115,12 +115,13 @@ $app->map(['GET', 'POST'], '/game/{id}/token', function (ServerRequestInterface 
     $nexmo = $this->get(NexmoClient::class);
 
     $conversation = $conversationService->getByName($args['id']);
+    $user = $conversationService->getUser($request->getParsedBody()['user_id']);
     $member = $conversationService->addMember($conversation['id'], $request->getParsedBody()['user_id']);
 
     $data = [
         'ot_token' => $opentok->generateToken($gameData['video_session']),
         'member_id' => $member['id'],
-        'conversation_token' => (string) $nexmo->generateJwt(['exp' => time() + (3600 * 23)]),
+        'conversation_token' => (string) $nexmo->generateJwt(['sub' => $user['name'], 'exp' => time() + (3600 * 23)]),
     ];
 
     return new JsonResponse($data);
