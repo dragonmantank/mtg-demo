@@ -56,6 +56,7 @@ $app->map(['GET', 'POST'], '/game[/{id}]', function (ServerRequestInterface $req
         if ($gameData) {
             return new JsonResponse(json_decode($gameData, true));
         }
+        return $response->withStatus(404);
     }
 
     $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
