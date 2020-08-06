@@ -121,7 +121,23 @@ $app->map(['GET', 'POST'], '/game/{id}/token', function (ServerRequestInterface 
     $data = [
         'ot_token' => $opentok->generateToken($gameData['video_session']),
         'member_id' => $member['id'],
-        'conversation_token' => (string) $nexmo->generateJwt(['sub' => $user['name'], 'exp' => time() + (3600 * 23)]),
+        'conversation_token' => (string) $nexmo->generateJwt([
+            'sub' => $user['name'],
+            'exp' => time() + (3600 * 23),
+            'acl' => [
+                'paths' => [
+                    '/*/users/**' => (object) [],
+                    '/*/conversations/**' => (object) [],
+                    '/*/sessions/**' => (object) [],
+                    '/*/devices/**' => (object) [],
+                    '/*/image/**' => (object) [],
+                    '/*/media/**' => (object) [],
+                    '/*/applications/**' => (object) [],
+                    '/*/push/**' => (object) [],
+                    '/*/knocking/**' => (object) [],
+                ]
+            ]
+        ]),
     ];
 
     return new JsonResponse($data);
