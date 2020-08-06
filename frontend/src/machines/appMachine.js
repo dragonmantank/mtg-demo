@@ -19,12 +19,6 @@ export const appMachine = Machine(
     id: 'app',
     initial: 'init',
     context: {
-      gameData: {
-        conversationSession: 'CON-f743bbf3-628b-479f-a651-39e458430be0',
-        gameId: 'lcexzd0omv',
-        videoSession:
-          '2_MX40Njg3MzcwNH5-MTU5NjY3ODkxOTk0OH5wOCt6ZnlKS21iTkFsNlFlVStVb2dOR0d-UH4',
-      },
       gameId: '',
       error: null,
     },
@@ -56,8 +50,8 @@ export const appMachine = Machine(
               onError: {
                 target: '#lobby.error',
                 actions: assign({
-                  error: (ctx, e) => {
-                    return e.data;
+                  error: () => {
+                    return 'That game does not exist.';
                   },
                 }),
               },
@@ -77,7 +71,7 @@ export const appMachine = Machine(
               onError: {
                 target: '#lobby.error',
                 actions: assign({
-                  error: (ctx, e) => {
+                  error: () => {
                     return 'There was an error creating the game.';
                   },
                 }),

@@ -8,10 +8,10 @@ import App from './components/App';
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <MachineProvider>
+
         <CSSReset />
         <App />
-      </MachineProvider>
+
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')

@@ -15,8 +15,6 @@ function Game({ machine }) {
   const [state, send] = useService(machine);
   const { isOpen, onOpen, onClose } = useDisclosure();
   
-  console.log(state);
-  
   return (
     <>
       <Button

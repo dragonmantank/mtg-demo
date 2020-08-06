@@ -5,8 +5,7 @@ import { appMachine } from './machines/appMachine';
 const MachineContext = React.createContext();
 
 function MachineProvider({ children }) {
-  const [state, send, service] = useMachine(appMachine);
-  
+  const [state, send, service] = useMachine(appMachine, { deferEvents: true });
   const value = {
     state,
     send,

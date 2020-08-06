@@ -4,7 +4,6 @@ import { Alert, AlertIcon, Button, Flex, Input } from '@chakra-ui/core';
 
 function InitialLogin({ machine }) {
   const [state, send] = useService(machine);
-  console.log('InitialLogin', state);
   return (
     <Flex
       direction="column"
@@ -23,7 +22,9 @@ function InitialLogin({ machine }) {
       ) : null}
       <Input
         value={state.context.name}
-        onChange={(e) => send({ type: 'UPDATE_NAME', name: e.target.value })}
+        onChange={(e) =>
+          send({ type: 'UPDATE_USERNAME', username: e.target.value })
+        }
         placeholder="Enter Name"
         size="sm"
         mb={6}

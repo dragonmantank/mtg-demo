@@ -1,68 +1,62 @@
 // this machine track the details for a player
-import { Machine, assign, sendParent } from 'xstate';
+import { Machine, assign, sendParent, sendUpdate } from 'xstate';
+import axios from 'axios';
+
+const normalizeResponse = ({ member_id, lobby, user_id }) => ({
+  lobby,
+  memberId: member_id,
+  userId: user_id,
+});
 
 export const playerMachine = Machine(
-  {
-    id: 'player',
-    initial: 'log_in',
-    context: {
-      name: '',
-      user: null,
-    },
-    states: {
-      log_in: {
-        id: 'log_in',
-        on: {
-          UPDATE_NAME: {
-            actions: 'updateName',
-          },
-          JOIN_LOBBY: { 
-            // create conversation user before sending ready
-            actions: sendParent('READY'),
-          },
-        },
-      },
-      connected: {},
-      playing: {
-        id: 'playing',
-        initial: 'init',
-        states: {
-          init: {
-            invoke: [
-              {
-                src: 'getVideoToken',
-              },
-              {
-                src: 'joinConversation',
-              },
-            ],
-          },
-          ready: {
-            // create publisher
-            // publish video
-            // listen for events - video, conversations
-          },
-        },
-        on: {
-          START_VIDEO: {
-            actions: () => console.log('starting video'),
-            target: 'playing',
-          },
-        },
-      },
-    },
-  },
-  {
-    actions: {
-      updateName: assign({ name: (_, e) => e.name }),
-    },
-    services: {
-      getVideoToken: () => {
-        console.log('Getting Token');
-      },
-      joinConversation: () => {
-        console.log('Joining Conversation');
-      },
-    },
-  }
-);
+         {
+           id: 'player',
+           initial: 'login',
+           context: {
+             username: '',
+             userData: null,
+           },
+           states: {
+             login: {
+               id: 'login',
+               on: {
+                 UPDATE_USERNAME: {
+                   actions: 'updateUserName',
+                 },
+                 JOIN_LOBBY: '#joining',
+               },
+             },
+             joining: {
+               id: 'joining',
+               invoke: {
+                 src: 'joinLobby',
+                 onDone: {
+                   target: '#connected',
+                   actions: 'updateUserData',
+                 },
+                 onError: {
+                   target: '#login',
+                   actions: 'logEvent',
+                 },
+               },
+             },
+             connected: {
+               id: 'connected',
+               entry: [sendUpdate(), sendParent('READY')],
+             },
+           },
+         },
+         {
+           actions: {
+             logEvent: (ctx, e) => console.log(e),
+             updateUserData: assign({
+               userData: (_, e) => normalizeResponse(e.data.data),
+             }),
+             updateUserName: assign({ username: (_, e) => e.username }),
+           },
+           services: {
+             joinLobby: (ctx) =>
+               axios.post('/lobby/users', { username: ctx.username }),
+           },
+         }
+       );
