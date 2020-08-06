@@ -57,11 +57,9 @@ class Conversations
         $request = $factory->createRequest(
             'GET',
             'https://api.nexmo.com/beta2/conversations',
-            [
-                'query' => ['name' => $name]
-            ]
         );
 
+        $request = $request->withUri($request->getUri()->withQuery(http_build_query(['name' => $name])));
         $apiResponse = $this->nexmoClient->send($request);
         $data = json_decode($apiResponse->getBody()->getContents(), true);
 
@@ -78,16 +76,16 @@ class Conversations
         $request = $factory->createRequest(
             'GET',
             'https://api.nexmo.com/beta2/users',
-            [
-                'query' => ['name' => $name]
-            ]
         );
 
         $apiResponse = $this->nexmoClient->send($request);
         $data = json_decode($apiResponse->getBody()->getContents(), true);
 
-        if (count($data['_embedded']['data']['users']) === 1) {
-            return $data['_embedded']['data']['users'][0];
+        foreach ($data['_embedded']['data']['users'] as $row) {
+            if ($row['name'] === $name) {
+                return $row;
+                break;
+            }
         }
         
         return null;       
@@ -99,16 +97,15 @@ class Conversations
         $request = $factory->createRequest(
             'GET',
             'https://api.nexmo.com/beta2/conversations/' . $conversationId . '/members',
-            [
-                'query' => ['user_id' => $userId]
-            ]
         );
 
         $apiResponse = $this->nexmoClient->send($request);
         $data = json_decode($apiResponse->getBody()->getContents(), true);
 
-        if (count($data['_embedded']['data']['members']) === 1) {
-            return $data['_embedded']['data']['members'][0];
+        foreach ($data['_embedded']['data']['members'] as $row) {
+            if ($row['user_id'] === $userId) {
+                return $row;
+            }
         }
         
         return null;       

@@ -119,7 +119,7 @@ $app->map(['GET', 'POST'], '/lobby/users', function(ServerRequestInterface $requ
     $user = $conversationService->getUserByName($body['username']);
 
     if (!$user) {
-        $user = $conversationService->createUser($body['username']);
+        $user = $conversationService->createUser($body['username']);   
     }
 
     $lobbyConversation = $conversationService->getByName('lobby');
@@ -133,6 +133,7 @@ $app->map(['GET', 'POST'], '/lobby/users', function(ServerRequestInterface $requ
     }
 
     return new JsonResponse([
+        'user_id' => $user['user_id'] ?? $user['id'],
         'member_id' => $member['id'],
         'lobby' => $lobbyConversation['id']
     ]);
