@@ -111,4 +111,31 @@ $app->get('/', function(ServerRequestInterface $request, ResponseInterface $resp
     return $response;
 });
 
+$app->map(['GET', 'POST'], '/lobby/users', function(ServerRequestInterface $request, ResponseInterface $response) {
+    $body = $request->getParsedBody();
+
+    /** @var Conversations $conversationService */
+    $conversationService = $this->get(Conversations::class);
+    $user = $conversationService->getUserByName($body['username']);
+
+    if (!$user) {
+        $user = $conversationService->createUser($body['username']);
+    }
+
+    $lobbyConversation = $conversationService->getByName('lobby');
+    if (!$lobbyConversation) {
+        $lobbyConversation = $conversationService->create('lobby');
+    }
+
+    $member = $conversationService->findMemberByUserId($lobbyConversation['id'], $user['user_id'] ?? $user['id']);
+    if (!$member) {
+        $member = $conversationService->addMember($lobbyConversation['id'], $user['user_id'] ?? $user['id']);
+    }
+
+    return new JsonResponse([
+        'member_id' => $member['id'],
+        'lobby' => $lobbyConversation['id']
+    ]);
+});
+
 $app->run();
