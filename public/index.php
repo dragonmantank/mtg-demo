@@ -151,6 +151,8 @@ $app->get('/', function(ServerRequestInterface $request, ResponseInterface $resp
 $app->map(['GET', 'POST'], '/lobby/users', function(ServerRequestInterface $request, ResponseInterface $response) {
     $body = $request->getParsedBody();
 
+    /** @var NexmoClient $nexmo */
+    $nexmo = $this->get(NexmoClient::class);
     /** @var Conversations $conversationService */
     $conversationService = $this->get(Conversations::class);
     $user = $conversationService->getUserByName($body['username']);
@@ -172,7 +174,24 @@ $app->map(['GET', 'POST'], '/lobby/users', function(ServerRequestInterface $requ
     return new JsonResponse([
         'user_id' => $user['user_id'] ?? $user['id'],
         'member_id' => $member['id'],
-        'lobby' => $lobbyConversation['id']
+        'lobby' => $lobbyConversation['id'],
+        'conversation_token' => (string) $nexmo->generateJwt([
+            'sub' => $user['name'],
+            'exp' => time() + (3600 * 23),
+            'acl' => [
+                'paths' => [
+                    '/*/users/**' => (object) [],
+                    '/*/conversations/**' => (object) [],
+                    '/*/sessions/**' => (object) [],
+                    '/*/devices/**' => (object) [],
+                    '/*/image/**' => (object) [],
+                    '/*/media/**' => (object) [],
+                    '/*/applications/**' => (object) [],
+                    '/*/push/**' => (object) [],
+                    '/*/knocking/**' => (object) [],
+                ]
+            ]
+        ]),
     ]);
 });
 
