@@ -24,15 +24,9 @@ function App() {
         <InitialLogin machine={state.context.selfRef} />
       ) : null}
       {state.value.lobby ? (
-        <Lobby
-          status={state.value.lobby}
-          context={state.context}
-          send={send}
-        />
+        <Lobby status={state.value.lobby} context={state.context} send={send} />
       ) : null}
-      {state.value === 'game' ? (
-        <Game />
-      ) : null}
+      {state.value === 'game' ? <Game machine={state.context.gameRef} /> : null}
     </Flex>
   );
 }

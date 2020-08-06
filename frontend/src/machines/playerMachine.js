@@ -1,6 +1,6 @@
 // this machine track the details for a player
 import { Machine, assign, sendParent } from 'xstate';
-console.log(process.env.REACT_APP_OT_KEY);
+
 export const playerMachine = Machine(
   {
     id: 'player',
