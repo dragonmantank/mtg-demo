@@ -38,6 +38,18 @@ $container->set(Conversations::class, function() use ($container) {
     );
 });
 
+$container->set('redis', function() {
+    $redisUrl = $_ENV['REDIS'];
+    if (!$redisUrl) {
+        $redisUrl = '127.0.0.1';
+    }
+
+    $redis = new Redis();
+    $redis->connect($redisUrl);
+
+    return $redis;
+});
+
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
@@ -45,8 +57,7 @@ $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 
 $app->map(['GET', 'POST'], '/game[/{id}]', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-    $redis = new Redis();
-    $redis->connect('redis');
+    $redis = $this->get('redis');
     if ($redis->ping() === false) {
         throw new \RuntimeException('Redis is unavailable');
     }
@@ -85,8 +96,7 @@ $app->map(['GET', 'POST'], '/game[/{id}]', function (ServerRequestInterface $req
 });
 
 $app->map(['GET', 'POST'], '/game/{id}/token', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-    $redis = new Redis();
-    $redis->connect('redis');
+    $redis = $this->get('redis');
     if ($redis->ping() === false) {
         throw new \RuntimeException('Redis is unavailable');
     }
