@@ -1,5 +1,5 @@
 #video-container {
-    display: none;
+    /*display: none;*/
     position: relative;
     width: 640px;
     height: 360px;
@@ -11,6 +11,10 @@
 /*    width: 640px;*/
 /*    height: 360px;*/
 /*}*/
+
+#publisher {
+    display: none;
+}
 
 video {
     width: 100%;
