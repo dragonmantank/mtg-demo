@@ -99,9 +99,18 @@ $app->map(['GET', 'POST'], '/game/{id}/token', function (ServerRequestInterface 
 
     /** @var OpenTok $opentok */
     $opentok = $this->get(OpenTok::class);
+    /** @var Conversations $conversationService */
+    $conversationService = $this->get(Conversations::class);
+    /** @var NexmoClient $nexmo */
+    $nexmo = $this->get(NexmoClient::class);
+
+    $conversation = $conversationService->getByName($args['id']);
+    $member = $conversationService->addMember($conversation['id'], $request->getParsedBody()['user_id']);
 
     $data = [
-        'token' => $opentok->generateToken($gameData['video_session'])
+        'ot_token' => $opentok->generateToken($gameData['video_session']),
+        'member_id' => $member['id'],
+        'conversation_token' => (string) $nexmo->generateJwt(),
     ];
 
     return new JsonResponse($data);

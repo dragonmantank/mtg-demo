@@ -39,7 +39,7 @@ class Conversations
                 'display_name' => 'Game',
                 'image_url' => 'https://dragonmantank.ngrok.io/image',
                 'properties' => [
-                    'ttl' => 60
+                    'ttl' => 3600
                 ],
             ]
         ));
