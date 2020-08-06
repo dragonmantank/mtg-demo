@@ -120,7 +120,7 @@ $app->map(['GET', 'POST'], '/game/{id}/token', function (ServerRequestInterface 
     $data = [
         'ot_token' => $opentok->generateToken($gameData['video_session']),
         'member_id' => $member['id'],
-        'conversation_token' => (string) $nexmo->generateJwt(['exp' => time() * 3600 * 24]),
+        'conversation_token' => (string) $nexmo->generateJwt(['exp' => time() + (3600 * 23)]),
     ];
 
     return new JsonResponse($data);
