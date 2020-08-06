@@ -38,6 +38,16 @@ function Game({ machine }) {
 
         <Flex direction="row" justifyContent="space-around">
           <Flex direction="column" w={['640px']}>
+
+            <div id="media-container">
+
+              <label htmlFor="audio-source-select">Audio Source:</label><select id="audio-source-select"></select><br/>
+              <label htmlFor="video-source-select">Video Source:</label><select id="video-source-select"></select>
+              <br/>
+              <button id="publish-btn" type="button">Publish</button>
+
+            </div>
+
             <div id="video-container">
               <video width="640" height="360" crossOrigin="anonymous" muted></video>
               <div id="help-section"></div>

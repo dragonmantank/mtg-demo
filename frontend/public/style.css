@@ -1,5 +1,5 @@
 #video-container {
-    /*display: none;*/
+    display: none;
     position: relative;
     width: 640px;
     height: 360px;

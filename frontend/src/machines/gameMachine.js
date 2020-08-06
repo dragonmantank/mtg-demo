@@ -79,12 +79,11 @@ export const gameMachine = Machine(
                const video = document.querySelector('video');
                const helpSection = document.querySelector('#help-section');
 
-               const constraints = {
-                 audio: true,
-                 video: {
-                   width: { min: 1024, ideal: 1280, max: 1920 },
-                   height: { min: 576, ideal: 720, max: 1080 },
-                 }};
+               const mediaContainer = document.querySelector('#media-container');
+               const audioSelector = document.querySelector('#audio-source-select');
+               const videoSelector = document.querySelector('#video-source-select');
+               const publishBtn = document.querySelector('#publish-btn');
+
 
                let publisher;
 
@@ -138,44 +137,86 @@ export const gameMachine = Machine(
                  timerId = setInterval(doOCR, 1000);
                }
 
-               navigator.mediaDevices.getUserMedia(constraints)
-               .then(async function(mediaStream) {
-                 console.log('mediaStream: ', mediaStream);
-                 video.srcObject = mediaStream;
-                 video.onloadedmetadata = function(e) {
-                   video.play();
-                   const stream = video.captureStream();
-                   const videoTracks = stream.getVideoTracks();
-                   const audioTracks = stream.getAudioTracks();
 
-                   publisher = OT.initPublisher('publisher', {
-                     insertMode: 'append',
-                     videoSource: videoTracks[0],
-                     audioSource: audioTracks[0],
-                     width: '100%',
-                     height: '100%',
+               // List cameras and microphones.
+
+               navigator.mediaDevices.enumerateDevices()
+                   .then(function(devices) {
+                     let index = 0;
+                     devices.forEach(function(device) {
+                       // console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
+                       console.table(device);
+                       if (device.kind === 'audioinput'){
+                         audioSelector.innerHTML += `<option value="${device.deviceId}">${device.label || device.kind + index}</option>`
+                       } else if (device.kind === 'videoinput'){
+                         videoSelector.innerHTML += `<option value="${device.deviceId}">${device.label || device.kind + index}</option>`
+                       }
+                     });
+                   })
+                   .catch(function(err) {
+                     console.log(err.name + ": " + err.message);
                    });
-                 };
-                 //start the OCR
-                 console.log('Initializing Tesseract.js')
-                 for (let i = 0; i < 4; i++) {
-                   const worker = createWorker();
-                   await worker.load();
-                   await worker.loadLanguage('eng');
-                   await worker.initialize('eng');
-                   await worker.setParameters({
-                     tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
-                   });
-                   scheduler.addWorker(worker);
-                 }
-                 video.addEventListener('pause', () => {
-                   clearInterval(timerId);
-                 });
-                 video.controls = true;
-                 console.log('Tesseract.js Initialized');
-                 startTimer();
+
+               publishBtn.addEventListener('click', () => {
+                 console.log(audioSelector.value);
+                 console.log(videoSelector.value);
+                 showVideo();
                })
-               .catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+
+
+               const showVideo = () => {
+                 const constraints = {
+                   audio: { deviceId:audioSelector.value },
+                   video: {
+                     deviceId:videoSelector.value,
+                     width: { min: 1024, ideal: 1280, max: 1920 },
+                     height: { min: 576, ideal: 720, max: 1080 },
+                   }};
+
+                 videoContainer.style.display = 'block';
+                 mediaContainer.style.display = 'none';
+
+                 navigator.mediaDevices.getUserMedia(constraints)
+                     .then(async function(mediaStream) {
+                       console.log('mediaStream: ', mediaStream);
+                       video.srcObject = mediaStream;
+                       video.onloadedmetadata = function(e) {
+                         video.play();
+                         const stream = video.captureStream();
+                         const videoTracks = stream.getVideoTracks();
+                         const audioTracks = stream.getAudioTracks();
+
+                         publisher = OT.initPublisher('publisher', {
+                           insertMode: 'append',
+                           videoSource: videoTracks[0],
+                           audioSource: audioTracks[0],
+                           width: '100%',
+                           height: '100%',
+                         });
+                       };
+                       //start the OCR
+                       console.log('Initializing Tesseract.js')
+                       for (let i = 0; i < 4; i++) {
+                         const worker = createWorker();
+                         await worker.load();
+                         await worker.loadLanguage('eng');
+                         await worker.initialize('eng');
+                         await worker.setParameters({
+                           tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
+                         });
+                         scheduler.addWorker(worker);
+                       }
+                       video.addEventListener('pause', () => {
+                         clearInterval(timerId);
+                       });
+                       video.controls = true;
+                       console.log('Tesseract.js Initialized');
+                       startTimer();
+                     })
+                     .catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+
+               }
+
 
                let session = OT.initSession(
                  process.env.REACT_APP_OT_KEY,
