@@ -56,18 +56,16 @@ class JoinLobby
                 'exp' => time() + (3600 * 23),
                 'acl' => [
                     'paths' => [
-                        '/*/users/**' => (object) [],
-                        '/*/conversations/**' => (object) [],
-                        '/*/sessions/**' => (object) [],
-                        '/*/devices/**' => (object) [],
-                        '/*/image/**' => (object) [],
-                        '/*/media/**' => (object) [],
-                        '/*/applications/**' => (object) [],
-                        '/*/push/**' => (object) [],
-                        '/*/knocking/**' => (object) [],
+                        '/*/conversations/'. $lobbyConversation['id'] . '/members' => ['methods' => ['GET']],
+                        '/*/conversations/'. $lobbyConversation['id'] . '/events' => ['methods' => ['GET', 'POST']],
                     ]
                 ]
             ]),
+            'links' => [
+                'read_users' => 'https://api.nexmo.com/beta2/conversations/'. $lobbyConversation['id'] . '/members',
+                'read_events' => 'https://api.nexmo.com/beta2/conversations/'. $lobbyConversation['id'] . '/events',
+                'create_events' => 'https://api.nexmo.com/beta/conversations/'. $lobbyConversation['id'] . '/events',
+            ]
         ]);
     }
 }

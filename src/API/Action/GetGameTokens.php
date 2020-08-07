@@ -64,18 +64,16 @@ class GetGameTokens
                 'exp' => time() + (3600 * 23),
                 'acl' => [
                     'paths' => [
-                        '/*/users/**' => (object) [],
-                        '/*/conversations/**' => (object) [],
-                        '/*/sessions/**' => (object) [],
-                        '/*/devices/**' => (object) [],
-                        '/*/image/**' => (object) [],
-                        '/*/media/**' => (object) [],
-                        '/*/applications/**' => (object) [],
-                        '/*/push/**' => (object) [],
-                        '/*/knocking/**' => (object) [],
+                        '/*/conversations/'. $conversation['id'] . '/members' => ['methods' => ['GET']],
+                        '/*/conversations/'. $conversation['id'] . '/events' => ['methods' => ['GET', 'POST']],
                     ]
                 ]
             ]),
+            'links' => [
+                'read_users' => 'https://api.nexmo.com/beta2/conversations/'. $conversation['id'] . '/members',
+                'read_events' => 'https://api.nexmo.com/beta2/conversations/'. $conversation['id'] . '/events',
+                'create_events' => 'https://api.nexmo.com/beta/conversations/'. $conversation['id'] . '/events',
+            ]
         ];
     
         return new JsonResponse($data);
